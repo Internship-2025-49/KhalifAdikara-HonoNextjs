@@ -7,7 +7,9 @@
   "dependencies": {
     "@hono/node-server": "^1.13.8",
     "@prisma/client": "^6.3.1",
-    "hono": "^4.6.20"
+    "dotenv": "^16.4.7",
+    "hono": "^4.6.20",
+    "prisma": "^5.13.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
