@@ -4,6 +4,7 @@ dotenv.config();
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { handle } from 'hono/vercel';
+import { cors } from 'hono/cors';
 
 import posts from './routes/posts.js';
 import books from './routes/books.js';
@@ -11,13 +12,15 @@ import users from './routes/users.js';
 
 const app = new Hono().basePath('/api');
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!');
-});
+app.use('*', cors({
+  origin: 'http://localhost:3000',
+  allowMethods: ['GET','POST', 'PUT', 'DELETE'], 
+  allowHeaders: ["*"],
+}));
 
 app.route('/posts', posts);
 app.route('/books', books);
-app.route('/users', users)
+app.route('/users', users);
 
 const port = 3000;
 console.log(`Server is running on http://localhost:${port}`);
