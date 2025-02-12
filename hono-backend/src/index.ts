@@ -12,11 +12,7 @@ import users from './routes/users.js';
 
 const app = new Hono().basePath('/api');
 
-app.use('*', cors({
-  origin: 'http://localhost:3000',
-  allowMethods: ['GET','POST', 'PUT', 'DELETE'], 
-  allowHeaders: ["*"],
-}));
+app.use('*', cors());
 
 app.route('/posts', posts);
 app.route('/books', books);
