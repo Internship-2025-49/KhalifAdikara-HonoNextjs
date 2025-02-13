@@ -44,10 +44,14 @@ export default function Users() {
 
     return (
         <div className="w-full max-w-7xl m-auto">
+            
             <table className="w-full border-collapse border border-slate-400">
                 <caption className="caption-top py-5 font-bold text-green-500 text-2xl">
                     List Users - Counter: 
                     <span className="text-red-500 font-bold">{users.length}</span>
+                    <p>
+                        <Link href={`/users/create`} className="bg-green-500 p-2 mt-6 inline-block text-white">Create</Link>
+                    </p>
                 </caption>
                 <thead>
                     <tr className="text-center">
@@ -60,11 +64,6 @@ export default function Users() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td colSpan={6}>
-                            <Link href={`/users/create`} className="bg-green-500 p-2 inline-block text-white">Create</Link>
-                        </td>
-                    </tr>
                     {users.map((item: UserModel) => (
                         <User key={item.id} {...item} deleteUser={delete_User} />
                     ))}
