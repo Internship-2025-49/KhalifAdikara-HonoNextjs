@@ -37,7 +37,7 @@ export default function PostEdit({ params }: { params: Promise<{ id: number }> }
 
             const content = await res.json();
             if (content.success > 0) {
-                router.push("/post");
+                router.push("/users");
             }
         }
     };
