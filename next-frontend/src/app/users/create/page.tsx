@@ -21,7 +21,7 @@ export default function UserCreate() {
                 phone: phone,
             };
 
-            const add = await fetch('/queries/users', {
+            const add = await fetch('/utils/queries/users', {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json'

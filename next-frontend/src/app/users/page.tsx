@@ -9,7 +9,7 @@ import User from "../components/User";
 
 export default function Users() {
     const [users, setUsers] = useState<UserModel[]>([]);
-    const { data, error } = useSWR<{ result: UserModel[] }>(`/queries/users`, fetcher);
+    const { data, error } = useSWR<{ result: UserModel[] }>(`/utils/queries/users`, fetcher);
 
     useEffect(() => {
         console.log("Data fetched:", data);
@@ -28,7 +28,7 @@ export default function Users() {
     if (!data) return <div>Loading...</div>;
 
     const delete_User: UserModel['deleteUser'] = async (id: number) => {
-        const res = await fetch(`/queries/users/${id}`, {
+        const res = await fetch(`/utils/queries/users/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
