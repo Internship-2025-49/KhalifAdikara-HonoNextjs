@@ -2,17 +2,22 @@
   "name": "hono-backend",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.8",
     "@prisma/client": "^6.3.1",
     "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.39.3",
     "hono": "^4.6.20",
+    "mysql2": "^3.12.0",
     "prisma": "^5.13.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
-    "tsx": "^4.7.1"
+    "drizzle-kit": "^0.30.4",
+    "tsx": "^4.19.2"
   }
 }
