@@ -1,11 +1,15 @@
 import type { Context } from "hono";
-import prisma from "../../prisma/client/index.js";
+import  { users }  from "../db/schema.js";
+import { asc, eq } from "drizzle-orm";
+import { db } from "../db/index.js";
 
 export const getUsers = async (c: Context) => {
     try {
-        const users = await prisma.users.findMany({ orderBy: { id: 'asc' } });
+        const data = await db.query.users.findMany({
+            orderBy: [asc(users.id)],
+        });
 
-        return c.json(users);
+        return c.json(data);
 
     } catch (e: unknown) {
         console.error(`Error getting users: ${e}`);
@@ -22,16 +26,17 @@ export async function createUser(c: Context) {
     const address  = typeof body['address'] === 'string' ? body['address'] : '';
     const phone  = typeof body['phone'] === 'string' ? body['phone'] : '';
 
-    const users = await prisma.users.create({
-        data: {
+    const data = await db.insert(users).values(
+        {
             username: username,
             name: name,
             address: address,
             phone: phone
+            
         }
-    });
+    );
 
-    return c.json(users);
+    return c.json(data);
 
     } catch (e: unknown) {
         console.error(`Error creating post: ${e}`);
@@ -41,12 +46,12 @@ export async function createUser(c: Context) {
 
 export async function getUserById(c: Context) {
     try {
+        const userId = parseInt(c.req.param("id"));
 
-        const userId = parseInt(c.req.param('id'));
+        const user = await db.select()
+            .from(users) 
+            .where(eq(users.id, userId));
 
-        const user = await prisma.users.findUnique({
-            where: { id: userId },
-        });
 
         if (!user) {
             return c.json({
@@ -55,7 +60,7 @@ export async function getUserById(c: Context) {
             }, 404);
         }
 
-        return c.json(user);
+        return c.json(user[0]);
 
     } catch (e: unknown) {
         console.error(`Error finding post: ${e}`);
@@ -73,18 +78,20 @@ export async function updateUser(c: Context) {
         const address  = typeof body['address'] === 'string' ? body['address'] : '';
         const phone  = typeof body['phone'] === 'string' ? body['phone'] : '';
 
-        const user = await prisma.users.update({
-            where: { id: userId },
-            data: {
+        await db.update(users)
+            .set({
                 username: username,
                 name: name,
                 address: address,
                 phone: phone,
-                updatedAt: new Date(),
-            },
-        });
+            })
+            .where(eq(users.id, userId));
 
-        return c.json(user);
+        const updatedUser = await db.select()
+            .from(users)
+            .where(eq(users.id, userId));
+
+        return c.json(updatedUser);
 
     } catch (e: unknown) {
         console.error(`Error updating post: ${e}`);
@@ -96,9 +103,8 @@ export async function deleteUser(c: Context) {
 
         const userId = parseInt(c.req.param('id'));
 
-        await prisma.users.delete({
-            where: { id: userId },
-        });
+        await db.delete(users)
+            .where(eq(users.id, userId));
 
         return c.json({
             statusCode: 200,
