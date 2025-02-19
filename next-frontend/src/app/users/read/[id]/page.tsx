@@ -1,15 +1,17 @@
 'use client'
 
-import { fetcher } from '@/app/libs'
-import { use } from 'react';
-import useSWR from 'swr';
+import { getUserById } from "@/app/utils/queries/users/[id]/route";
+import { useQuery } from "@tanstack/react-query";
+import { use } from "react";
 
 export default function Detail({ params }: { params: Promise<{ id: number }> }) {
-    const resolvedParams = use(params);
-    const { data: user, isLoading, error } = useSWR(`/utils/queries/users/${resolvedParams.id}`, fetcher);
+    const { id: userId } = use(params);
 
-    if (isLoading) return <div><span>Loading...</span></div>;
-    if (error) return <div><span>Error fetching data</span></div>;
+    const { data: user } = useQuery({
+        queryKey: ["user", userId],
+        queryFn: () => getUserById({ id: userId }),
+    });
+
     if (!user) return <div><span>No user found</span></div>;
 
     return (
