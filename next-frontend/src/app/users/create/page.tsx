@@ -3,36 +3,37 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { QueryClient, useMutation } from '@tanstack/react-query';
+import { createUser } from '@/app/utils/queries/users/route';
 
 export default function UserCreate() {
+    const queryClient = new QueryClient()
+    
     const router = useRouter();
     const [username, setUsername] = useState<string>('');
     const [name, setName] = useState<string>('');
     const [address, setAddress] = useState<string>('');
     const [phone, setPhone] = useState<string>('');
     
-    const addUser = async (e: any) => {
+    const mutation = useMutation({
+        mutationFn: createUser,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['todos'] });
+            router.push('/users');
+        },
+    });
+
+    const addUser = (e: any) => {
         e.preventDefault();
         if (username !== "" && address !== "" && name !== "" && phone !== "") {
-            const formData = {
-                username: username,
-                name: name,
-                address: address,
-                phone: phone,
+            const userData = {
+                username,
+                name,
+                address,
+                phone
             };
-
-            const add = await fetch('/utils/queries/users', {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const content = await add.json();
-            if (content.success > 0) {
-                router.push('/users');
-            }
+            
+            mutation.mutate(userData);
         }
     };
 
