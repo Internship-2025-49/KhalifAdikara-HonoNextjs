@@ -1,4 +1,4 @@
-export  interface UserModel{
+export interface UserModel{
     id:number,
     username:string,
     name:string,
@@ -10,7 +10,7 @@ export  interface UserModel{
 export interface UserAddModel{
     username:string,
     name:string,
-    adress:string,
+    address:string,
     phone:string,
 }
 
