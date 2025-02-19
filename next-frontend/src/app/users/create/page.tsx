@@ -1,19 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { QueryClient, useMutation } from '@tanstack/react-query';
 import { createUser } from '@/app/utils/queries/users/route';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel} from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
 
 export default function UserCreate() {
     const queryClient = new QueryClient()
-    
     const router = useRouter();
-    const [username, setUsername] = useState<string>('');
-    const [name, setName] = useState<string>('');
-    const [address, setAddress] = useState<string>('');
-    const [phone, setPhone] = useState<string>('');
+
+    const form = useForm({
+        defaultValues: {
+            username: "",
+            name: "",
+            address: "",
+            phone: "",
+        },
+    });
     
     const mutation = useMutation({
         mutationFn: createUser,
@@ -23,44 +32,72 @@ export default function UserCreate() {
         },
     });
 
-    const addUser = (e: any) => {
-        e.preventDefault();
-        if (username !== "" && address !== "" && name !== "" && phone !== "") {
-            const userData = {
-                username,
-                name,
-                address,
-                phone
-            };
-            
-            mutation.mutate(userData);
-        }
+    const submit = (data: any) => {
+        mutation.mutate(data);
     };
 
     return (
-        <div className="w-full max-w-7xl m-auto">
-            <form className='w-full' onSubmit={addUser}>
-                <span className='font-bold text-yellow-500 py-2 block underline text-2xl'>Form Add</span>
-                <div className='w-full py-2'>
-                    <label htmlFor="" className='text-sm font-bold py-2 block'>Username</label>
-                    <input type='text' name='username' className='w-full border-[1px] border-gray-200 p-2 rounded-sm' onChange={(e: any) => setUsername(e.target.value)} />
-                </div>
-                <div className='w-full py-2'>
-                    <label htmlFor="" className='text-sm font-bold py-2 block'>Name</label>
-                    <input type='text' name='name' className='w-full border-[1px] border-gray-200 p-2 rounded-sm' onChange={(e: any) => setName(e.target.value)} />
-                </div>
-                <div className='w-full py-2'>
-                    <label htmlFor="" className='text-sm font-bold py-2 block'>Address</label>
-                    <textarea name='address' className='w-full border-[1px] border-gray-200 p-2 rounded-sm' onChange={(e: any) => setAddress(e.target.value)} />
-                </div>
-                <div className='w-full py-2'>
-                    <label htmlFor="" className='text-sm font-bold py-2 block'>Phone</label>
-                    <input type='text' name='phone' className='w-full border-[1px] border-gray-200 p-2 rounded-sm' onChange={(e: any) => setPhone(e.target.value)} />
-                </div>
-                <div className='w-full py-2'>
-                    <button className="w-20 p-2 text-white border-gray-200 border-[1px] rounded-sm bg-green-400">Submit</button>
-                </div>
-            </form>
+        <div className='container w-full py-10'>
+            <div className='flex justify-center'>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(submit)} className='w-full mx-32'>
+                        <div className='text-center'>
+                            <span className='font-bold py-2 block text-4xl'>Add User</span>
+                        </div>
+
+                        <div className='w-full py-2'>
+                            <FormField control={form.control} name='username' render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Username</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter username' {...field} required />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                        </div>
+
+                        <div className='w-full py-2'>
+                            <FormField control={form.control} name='name' render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Name</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter name' {...field} required />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                        </div>
+
+                        <div className='w-full py-2'>
+                            <FormField control={form.control} name='address' render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Address</FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder='Enter address' {...field} required />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                        </div>
+
+                        <div className='w-full py-2'>
+                            <FormField control={form.control} name='phone' render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Phone</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter phone number' {...field} required />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                        </div>
+                        <div className='w-full py-2'>
+                            <Button type='submit'>Submit</Button>
+                        </div>
+                    </form>
+                </Form>
+            </div>
         </div>
     );
 }
