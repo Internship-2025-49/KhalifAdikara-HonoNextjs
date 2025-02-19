@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { UserAddModel } from '@/app/types/users';
 import { getApiKey, getAuthToken } from '@/app/utils/authHelpers';
-import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET() {
+export async function getUsers() {
     try {
         const token = await getAuthToken();
         const apiKey = await getApiKey(token);
@@ -14,19 +14,16 @@ export async function GET() {
             }
         });
 
-        const result = await res.json();
-        return NextResponse.json({ result });
-
+        return await res.json();
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        throw new Error(error.message);
     }
 }
 
-export async function POST(request: NextRequest) {
+export async function createUser(userData: UserAddModel) {
     try {
         const token = await getAuthToken();
         const apiKey = await getApiKey(token);
-        const body = await request.json();
 
         const res = await fetch('http://localhost:3000/api/users/data', {
             method: 'POST',
@@ -35,13 +32,11 @@ export async function POST(request: NextRequest) {
                 'api-key': apiKey,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(body),
+            body: JSON.stringify(userData),
         });
 
-        const data = await res.json();
-        return NextResponse.json(data);
-
+        return await res.json();
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        throw new Error(error.message);
     }
 }

@@ -1,52 +1,52 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { UserAddModel } from '@/app/types/users';
 import { getApiKey, getAuthToken } from '@/app/utils/authHelpers';
-import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(request : NextRequest,{ params }: { params: { id: number } }) {
-    try{
+export async function getUserById(params: { id: number }) {
+    try {
         const token = await getAuthToken();
         const apiKey = await getApiKey(token);
-        
+
         const res = await fetch(`http://localhost:3000/api/users/data/${params.id}`, {
             next: { revalidate: 10 },
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'api-key': apiKey
             }
-        })
-        const data = await res.json()
-        return NextResponse.json(data)
+        });
+
+        return await res.json();
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        throw new Error(error.message);
     }
 }
 
-export async function PUT(request: NextRequest,{ params }: { params: { id: number } }) {
+export async function updateUser(params: { id: number }, userData: UserAddModel) {
     try {
         const token = await getAuthToken();
         const apiKey = await getApiKey(token);
-        const body = await request.json();
-        
+
         const res = await fetch(`http://localhost:3000/api/users/data/${params.id}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'api-key': apiKey
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(body),
-        })
-        const data = await res.json();
-        return NextResponse.json(data)
+            body: JSON.stringify(userData),
+        });
+
+        return await res.json();
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        throw new Error(error.message);
     }
 }
 
-export async function DELETE(request: NextRequest,{ params }: { params: { id: number } }) {
+export async function deleteUser(params: { id: number }) {
     try {
         const token = await getAuthToken();
         const apiKey = await getApiKey(token);
-        
+
         const res = await fetch(`http://localhost:3000/api/users/data/${params.id}`, {
             next: { revalidate: 10 },
             method: 'DELETE',
@@ -54,13 +54,10 @@ export async function DELETE(request: NextRequest,{ params }: { params: { id: nu
                 'Authorization': `Bearer ${token}`,
                 'api-key': apiKey
             }
-        })
-        const data = await res.json();
-        return NextResponse.json(data)
+        });
+
+        return await res.json();
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        throw new Error(error.message);
     }
 }
-
-
-
