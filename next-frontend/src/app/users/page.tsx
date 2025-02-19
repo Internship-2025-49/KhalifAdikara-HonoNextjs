@@ -1,38 +1,27 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import useSWR from "swr";
-import { fetcher } from "../libs";
+import React from "react";
 import { UserModel } from "../types/users";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { TableCell } from "@/components/ui/table";
 import DataTable from "../components/TableUser";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getUsers } from "../utils/queries/users/route";
+import { deleteUser } from "../utils/queries/users/[id]/route";
 
 export default function Users() {
-    const { data, error } = useSWR<{ result: UserModel[] }>("/utils/queries/users", fetcher);
-    const [users, setUsers] = useState<UserModel[]>([]);
+    const queryClient = useQueryClient();
+    const { data: users = [], isLoading } = useQuery({ queryKey: ['users'], queryFn: getUsers });
 
-    useEffect(() => {
-        if (data && data.result && Array.isArray(data.result)) {
-        setUsers(data.result);
-        }
-    }, [data]);
+    const mutation = useMutation({
+        mutationFn: (id: number) => deleteUser({id}),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+        },
+    });
 
-    if (error) return <div>Failed to load</div>;
-    if (!data) return <div>Loading...</div>;
-
-    const deleteUser = async (id: number) => {
-        const res = await fetch(`/utils/queries/users/${id}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        });
-        const content = await res.json();
-        if (content.success > 0) {
-        setUsers(users.filter((user) => user.id !== id));
-        }
-    };
+    if (isLoading) return <div>Loading...</div>;
 
     const columns: ColumnDef<UserModel>[] = [
         { accessorKey: "id", header: "ID" },
@@ -43,8 +32,8 @@ export default function Users() {
         {
             header: "Actions",
             cell: ({ row }) => (
-                <TableCell className="flex gap-2">
-                    <Button variant="destructive" size="sm" onClick={() => deleteUser(row.original.id)}>
+                <div className="flex gap-2">
+                    <Button variant="destructive" size="sm" onClick={() => mutation.mutate(row.original.id)}>
                         Delete
                     </Button>
                     <Link href={`/users/edit/${row.original.id}`}>
@@ -53,20 +42,20 @@ export default function Users() {
                     <Link href={`/users/read/${row.original.id}`}>
                         <Button variant="outline" size="sm">View</Button>
                     </Link>
-                </TableCell>
+                </div>
             ),
-        },
+        }
     ];
 
     return (
         <div className="container mx-auto py-10">
-            <h2 className="text-2xl font-bold text-center mb-5">List Users - Counter: {users.length}</h2>
+            <h2 className="text-2xl font-bold text-center mb-5">List Users - Counter: {Array.isArray(users) ? users.length : 0}</h2>
             <div className="flex justify-center">
                 <Link href={`/users/create`}>
                     <Button className="mb-4">Create User</Button>
                 </Link>
             </div>
-            <DataTable columns={columns} data={users} />
+            <DataTable columns={columns} data={Array.isArray(users) ? users : []} />
         </div>
     );
 }
