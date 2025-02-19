@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect, use } from "react";
+import React, { useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 import { getUserById, updateUser } from "@/app/utils/queries/users/[id]/route";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 
 export default function UserEdit({ params }: { params: Promise<{ id: number }> }) {
     const queryClient = new QueryClient()
@@ -17,19 +22,25 @@ export default function UserEdit({ params }: { params: Promise<{ id: number }> }
         queryFn: () => getUserById({ id: userId })
     });
 
-    const [username, setUsername] = useState("");
-    const [name, setName] = useState("");
-    const [address, setAddress] = useState("");
-    const [phone, setPhone] = useState("");
+    const form = useForm({
+        defaultValues: {
+            username: "",
+            name: "",
+            address: "",
+            phone: "",
+        },
+    });
 
     useEffect(() => {
-        if (user?.result) {
-            setUsername(user.result.username);
-            setName(user.result.name);
-            setAddress(user.result.address);
-            setPhone(user.result.phone);
+        if (user) {
+            form.reset({
+                username: user.username,
+                name: user.name,
+                address: user.address,
+                phone: user.phone,
+            });
         }
-    }, [user]);
+    }, [user, form]);
 
     const mutation = useMutation({
         mutationFn: (data: any) => updateUser({ id: userId }, data),
@@ -39,48 +50,75 @@ export default function UserEdit({ params }: { params: Promise<{ id: number }> }
         },
     });
 
-    const editUser = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (username && name && address && phone) {
-            const userData = { 
-                username, 
-                name, 
-                address, 
-                phone 
-            };
-
-            mutation.mutate(userData);
-        }
+    const submit = (data: any) => {
+        mutation.mutate(data);
     };
 
     if (!user) return <div>User not found.</div>;
 
     return (
-        <div className="w-full max-w-7xl m-auto">
-            <form className="w-full" onSubmit={editUser}>
-                <span className="font-bold text-yellow-500 py-2 block underline text-2xl">Edit User</span>
-                <div className="w-full py-2">
-                    <label className="text-sm font-bold py-2 block">Username</label>
-                    <input type="text" className="w-full border-[1px] border-gray-200 p-2 rounded-sm" value={username} onChange={(e) => setUsername(e.target.value)}/>
-                </div>
-                <div className="w-full py-2">
-                    <label className="text-sm font-bold py-2 block">Name</label>
-                    <input type="text" className="w-full border-[1px] border-gray-200 p-2 rounded-sm" value={name} onChange={(e) => setName(e.target.value)}/>
-                </div>
-                <div className="w-full py-2">
-                    <label className="text-sm font-bold py-2 block">Address</label>
-                    <textarea className="w-full border-[1px] border-gray-200 p-2 rounded-sm" value={address} onChange={(e) => setAddress(e.target.value)}/>
-                </div>
-                <div className="w-full py-2">
-                    <label className="text-sm font-bold py-2 block">Phone</label>
-                    <input type="text" className="w-full border-[1px] border-gray-200 p-2 rounded-sm" value={phone} onChange={(e) => setPhone(e.target.value)}/>
-                </div>
-                <div className="w-full py-2">
-                    <button type="submit" className="w-20 p-2 text-white border-gray-200 border-[1px] rounded-sm bg-green-400">
-                        Update
-                    </button>
-                </div>
-            </form>
+        <div className='container w-full py-10'>
+            <div className='flex justify-center'>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(submit)} className='w-full mx-32'>
+                        <div className='text-center'>
+                            <span className='font-bold py-2 block text-4xl'>Edit User</span>
+                        </div>
+
+                        <div className='w-full py-2'>
+                            <FormField control={form.control} name='username' render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Username</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter username' {...field}/>
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                        </div>
+
+                        <div className='w-full py-2'>
+                            <FormField control={form.control} name='name' render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Name</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter name' {...field}/>
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                        </div>
+
+                        <div className='w-full py-2'>
+                            <FormField control={form.control} name='address' render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Address</FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder='Enter address' {...field}/>
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                        </div>
+
+                        <div className='w-full py-2'>
+                            <FormField control={form.control} name='phone' render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Phone</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter phone number' {...field}/>
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                        </div>
+
+                        <div className='w-full py-2'>
+                            <Button type='submit'>Update</Button>
+                        </div>
+                    </form>
+                </Form>
+            </div>
         </div>
     );
 }
