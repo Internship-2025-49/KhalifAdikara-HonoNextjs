@@ -1,6 +1,4 @@
-import { UseFormReturn } from "react-hook-form";
-import { z } from "zod";
-import { userSchema } from "./userSchema";
+import { userForm } from "./userSchema";
 
 export interface UserModel{
     id:number,
@@ -19,8 +17,7 @@ export interface UserAddModel{
 }
 
 export interface FormProps {
-    form: UseFormReturn<z.infer<typeof userSchema>>;
-    onSubmit(values: z.infer<typeof userSchema>): void;
+    user?: userForm;
     titleText: string;
     buttonText: string;
     required: boolean;
