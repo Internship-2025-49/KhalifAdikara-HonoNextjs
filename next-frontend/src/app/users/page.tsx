@@ -36,10 +36,10 @@ export default function Users() {
                     <Button variant="destructive" size="sm" onClick={() => mutation.mutate(row.original.id)}>
                         Delete
                     </Button>
-                    <Link href={`/users/edit/${row.original.id}`}>
+                    <Link href={`/users/${row.original.id}/edit`}>
                         <Button variant="outline" size="sm">Edit</Button>
                     </Link>
-                    <Link href={`/users/read/${row.original.id}`}>
+                    <Link href={`/users/${row.original.id}`}>
                         <Button variant="outline" size="sm">View</Button>
                     </Link>
                 </div>
