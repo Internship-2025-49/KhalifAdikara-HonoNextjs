@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import  { users }  from "../db/schema.js";
+import { users } from "../db/schema.js";
 import { asc, eq } from "drizzle-orm";
 import { db } from "../db/index.js";
 
@@ -18,30 +18,34 @@ export const getUsers = async (c: Context) => {
 
 export async function createUser(c: Context) {
     try {
+        const body = await c.req.json();
 
-    const body = await c.req.json();
+        const username = typeof body['username'] === 'string' ? body['username'] : '';
+        const name = typeof body['name'] === 'string' ? body['name'] : '';
+        const address = typeof body['address'] === 'string' ? body['address'] : '';
+        const phone = typeof body['phone'] === 'string' ? body['phone'] : '';
 
-    const username   = typeof body['username'] === 'string' ? body['username'] : '';
-    const name  = typeof body['name'] === 'string' ? body['name'] : '';
-    const address  = typeof body['address'] === 'string' ? body['address'] : '';
-    const phone  = typeof body['phone'] === 'string' ? body['phone'] : '';
-
-    const data = await db.insert(users).values(
-        {
-            username: username,
-            name: name,
-            address: address,
-            phone: phone
-            
+        if (!username || !name || !address || !phone) {
+            return c.json({
+                statusCode: 400,
+                message: 'All fields are required: username, name, address, phone',
+            }, 400);
         }
-    );
 
-    return c.json(data);
+        const data = await db.insert(users).values(
+            {
+                username: username,
+                name: name,
+                address: address,
+                phone: phone
+            }
+        );
+
+        return c.json(data);
 
     } catch (e: unknown) {
-        console.error(`Error creating post: ${e}`);
+        console.error(`Error creating user: ${e}`);
     }
-
 }
 
 export async function getUserById(c: Context) {
@@ -49,21 +53,20 @@ export async function getUserById(c: Context) {
         const userId = parseInt(c.req.param("id"));
 
         const user = await db.select()
-            .from(users) 
+            .from(users)
             .where(eq(users.id, userId));
-
 
         if (!user) {
             return c.json({
                 statusCode: 404,
-                message: 'User Tidak Ditemukan',
+                message: 'User not found',
             }, 404);
         }
 
         return c.json(user[0]);
 
     } catch (e: unknown) {
-        console.error(`Error finding post: ${e}`);
+        console.error(`Error finding user: ${e}`);
     }
 }
 
@@ -73,10 +76,17 @@ export async function updateUser(c: Context) {
 
         const body = await c.req.json();
 
-        const username   = typeof body['username'] === 'string' ? body['username'] : '';
+        const username = typeof body['username'] === 'string' ? body['username'] : '';
         const name = typeof body['name'] === 'string' ? body['name'] : '';
-        const address  = typeof body['address'] === 'string' ? body['address'] : '';
-        const phone  = typeof body['phone'] === 'string' ? body['phone'] : '';
+        const address = typeof body['address'] === 'string' ? body['address'] : '';
+        const phone = typeof body['phone'] === 'string' ? body['phone'] : '';
+
+        if (!username || !name || !address || !phone) {
+            return c.json({
+                statusCode: 400,
+                message: 'All fields are required: username, name, address, phone',
+            }, 400);
+        }
 
         await db.update(users)
             .set({
@@ -94,13 +104,12 @@ export async function updateUser(c: Context) {
         return c.json(updatedUser);
 
     } catch (e: unknown) {
-        console.error(`Error updating post: ${e}`);
+        console.error(`Error updating user: ${e}`);
     }
 }
 
 export async function deleteUser(c: Context) {
     try {
-
         const userId = parseInt(c.req.param('id'));
 
         await db.delete(users)
@@ -108,7 +117,7 @@ export async function deleteUser(c: Context) {
 
         return c.json({
             statusCode: 200,
-            message: 'User Berhasil Dihapus!',
+            message: 'User successfully deleted!',
         }, 200);
 
     } catch (e: unknown) {
