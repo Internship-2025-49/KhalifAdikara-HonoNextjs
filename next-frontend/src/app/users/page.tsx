@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import DataTable from "../components/TableUser";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUsers } from "../utils/queries/users/route";
-import { deleteUser } from "../utils/queries/users/[id]/route";
+import { getUsers } from "../utils/queries/users/query";
+import { deleteUser } from "../utils/queries/users/[id]/query";
 
 export default function Users() {
     const queryClient = useQueryClient();

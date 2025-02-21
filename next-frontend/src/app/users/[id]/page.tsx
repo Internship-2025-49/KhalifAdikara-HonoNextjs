@@ -1,6 +1,6 @@
 'use client'
 
-import { getUserById } from "@/app/utils/queries/users/[id]/route";
+import { getUserById } from "@/app/utils/queries/users/[id]/query";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";

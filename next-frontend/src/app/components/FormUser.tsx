@@ -13,8 +13,8 @@ import { userForm, userSchema } from '../types/userSchema';
 import { userDefaultValues } from '../types/defaultValues';
 import { QueryClient, useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { updateUser } from '../utils/queries/users/[id]/route';
-import { createUser } from '../utils/queries/users/route';
+import { updateUser } from '../utils/queries/users/[id]/query';
+import { createUser } from '../utils/queries/users/query';
 
 export default function UserForm({ user, titleText, buttonText }: FormProps) {
     const queryClient = new QueryClient()

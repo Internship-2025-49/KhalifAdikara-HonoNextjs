@@ -2,7 +2,7 @@
 
 import React, {  use } from "react";
 import { useQuery  } from "@tanstack/react-query";
-import { getUserById } from "@/app/utils/queries/users/[id]/route";
+import { getUserById } from "@/app/utils/queries/users/[id]/query";
 import UserForm from "@/app/components/FormUser";
 
 export default function UserEdit({ params }: { params: Promise<{ id: number }> }) {
